@@ -1,1 +1,3 @@
-web: gunicorn -w 4 -k uvicorn.workers.UvicornWorker ChatApp.asgi:application
+release: python manage.py migrate
+web: daphne ChatApp.asgi:application --port $PORT --bind 0.0.0.0 -v2
+worker: python manage.py runworker channels --settings=ChatApp.settings -v2

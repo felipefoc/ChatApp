@@ -9,6 +9,7 @@ channels = "*"
 channels-redis = "*"
 django-heroku = "*"
 uvicorn = "*"
+daphne = "*"
 
 [dev-packages]
 
