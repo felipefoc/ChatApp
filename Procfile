@@ -1,1 +1,1 @@
-web: gunicorn ChatApp.asgi
+web: uvicorn gunicorn ChatApp.asgi:application -k uvicorn.workers.UvicornWorker
