@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
+import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -72,31 +73,16 @@ TEMPLATES = [
 
 ASGI_APPLICATION = "ChatApp.asgi.application"
 
-REDIS_PASSWORD = '2F31oMmq7nybzjTxEwER7g9DHvQCAEcz'
-REDIS_HOST = 'redis-16279.c266.us-east-1-3.ec2.cloud.redislabs.com:16279'
-
-
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels_redis.core.RedisChannelLayer",
-#         "CONFIG": {
-#             "hosts": [
-#                 f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}",
-#             ],
-#         },
-#     },
-# }
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                f"redis://:{os.getenv('REDIS_PASSWORD')}@{os.getenv('REDIS_HOST')}",
+            ],
         },
     },
 }
-
-
-WSGI_APPLICATION = 'ChatApp.wsgi.application'
 
 
 # Database
@@ -147,3 +133,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+django_heroku.settings(locals())
