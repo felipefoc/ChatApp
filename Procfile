@@ -1,2 +1,1 @@
-web: daphne ChatApp.asgi:channel_layer --port $PORT --bind 0.0.0.0 -v2
-worker: python manage.py runserver 0.0.0.0:8000
+web: uvicorn ChatApp.asgi:application --host=0.0.0.0 --port=${PORT:-5000}
