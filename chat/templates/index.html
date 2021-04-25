@@ -1,0 +1,24 @@
+<!-- chat/templates/chat/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Rooms</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    What's your username?<br>
+    <input id="user_name_input" type="text" size="100"><br>
+    What chat room would you like to enter?<br>
+    <input id="room_name_input" type="text" size="100"><br>
+    <input id="button_submit" type="button" value="Enter">
+
+    <script>
+        $("#button_submit").click(function() {
+            var roomName = $("#room_name_input").val().toLowerCase();
+            var userName = $("#user_name_input").val();
+            window.location.pathname = '/' + userName + '/' + roomName + '/';
+        });
+    </script>
+</body>
+</html>
