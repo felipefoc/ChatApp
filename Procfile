@@ -1,3 +1,2 @@
 release: python manage.py migrate
-web: daphne ChatApp.asgi:application --port $PORT --bind 0.0.0.0 -v2
-worker: python manage.py runworker channels --settings=ChatApp.settings -v2
+web: bin/start-stunnel uvicorn ChatApp.asgi:application --limit-max-requests=1200 --port $PORT
