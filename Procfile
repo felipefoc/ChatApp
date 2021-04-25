@@ -1,1 +1,2 @@
-web: uvicorn main:app --reload --host 0.0.0.0 --port 8000
+web: daphne ChatApp.asgi:channel_layer --port $PORT --bind 0.0.0.0 -v2
+worker: python manage.py runworker -v2
