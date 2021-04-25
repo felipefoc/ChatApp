@@ -10,6 +10,8 @@ channels-redis = "*"
 django-heroku = "*"
 uvicorn = "*"
 daphne = "*"
+asgiref = "*"
+websockets = "*"
 
 [dev-packages]
 

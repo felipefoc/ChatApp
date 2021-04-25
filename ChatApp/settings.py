@@ -78,11 +78,12 @@ ASGI_APPLICATION = "ChatApp.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "BACKEND": "asgi_redis.RedisChannelLayer",
         "CONFIG": {
             "hosts": [
                 f"redis://:{os.getenv('REDIS_PASSWORD')}@{os.getenv('REDIS_HOST')}",
             ],
+        "ROUTING": "chat.routing.websocket_urlpatterns",
         },
     },
 }
