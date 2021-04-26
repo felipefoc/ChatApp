@@ -49,19 +49,24 @@
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            console.log(e)
+            const room = Object.keys(data)[1];
             document.querySelector('#chat-log').value += (data.message + '\n');
-
-            if (data.group == roomName) {
-                users = [userName]
-                list = ''
-                $.each(users, function(key, value){
+            list = ''
+            console.log(room) //vettore
+            console.log(roomName) //vettore
+            if (room == roomName) {
+                $.each(data[roomName], function(key, value){
                     list += '<li>' + value + '</li>';
                 })
                 $('#online-users').html(list)
             }
         };
-        
+
+
+
+
+
+
         {/* Before window close call "Disconnect" */}
         window.addEventListener('beforeunload', function (e) {
             chatSocket.onclose()           

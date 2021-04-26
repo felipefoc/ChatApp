@@ -1,18 +1,24 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from asgiref.sync import async_to_sync
+from channels_presence.models import Room
+from asgiref.sync import sync_to_async
+from channels.db import database_sync_to_async
+import asyncio
 
 
 
-class ChatConsumer(AsyncWebsocketConsumer):  
-
+class ChatConsumer(AsyncWebsocketConsumer):
+    online = []
+    
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
         self.user_name = self.scope['url_route']['kwargs']['user_name']
-   
-       
 
+        @database_sync_to_async
+        def get_to_db(self):
+            return Room.objects.add(self.room_name, self.channel_name, self.scope["user"])
+   
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -20,6 +26,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
+        await get_to_db(self)
 
         
     async def disconnect(self, close_code):
@@ -27,8 +34,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name,
-        )       
-               
+        ) 
+
+
+
 
     # Receive message from WebSocket
     async def receive(self, text_data):
@@ -43,18 +52,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'type': 'chat_message',
                 'message': f'{message}'
             }
-            # if user in self.users:
-            #     self.users.remove(user)
+
 
         # User connect
         if action == 'connect':
             data = {
                 'type': 'chat_message',
-                'message': f'{message}'
+                'message': f'{message}',            
             }
+        
 
-            # if user not in self.users:
-            #     self.users.append(user)
 
 
         # Data to message
@@ -63,6 +70,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'type': 'chat_message',
                 'message': f'{user}: {message}',              
             }     
+            
 
         # Send message to room group
         await self.channel_layer.group_send(
@@ -78,7 +86,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
-            'group': self.room_name,
-            'user': self.user_name,
+            #'user': self.user_name,
+            self.room_name: self.online,
         }))
         
