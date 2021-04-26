@@ -30,11 +30,13 @@
             'ws://'
             + window.location.host
             + '/ws/'
+            + userName
+            + '/'
             + roomName
             + '/'
         );
 
-
+        {/* Connect function */}        
         chatSocket.onopen = function(e) {
             console.log(userName + ' has joined.');
             message = (userName + ' entrou na sala.');
@@ -47,13 +49,25 @@
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
+            console.log(e)
             document.querySelector('#chat-log').value += (data.message + '\n');
+
+            if (data.group == roomName) {
+                users = [userName]
+                list = ''
+                $.each(users, function(key, value){
+                    list += '<li>' + value + '</li>';
+                })
+                $('#online-users').html(list)
+            }
         };
         
+        {/* Before window close call "Disconnect" */}
         window.addEventListener('beforeunload', function (e) {
             chatSocket.onclose()           
-        });
-
+        }); 
+        
+        {/* Disconnect function */}
         chatSocket.onclose = function(){
             console.error('Chat socket closed unexpectedly');
             console.log(userName + ' has leaved.');
