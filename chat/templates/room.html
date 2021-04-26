@@ -8,33 +8,63 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.min.js"></script>
 </head>
 <body>
-    <textarea id="chat-log" cols="100" rows="20"></textarea><br>
+    <textarea id="chat-log" cols="100" rows="20" readonly></textarea><br>
     <input id="chat-message-input" type="text" size="100"><br>
     <input id="chat-message-submit" type="button" value="Send">
     {{ room_name|json_script:"room_name" }}
     {{ user_name|json_script:"user_name" }}
+
+    <div>
+        <ul id="online-users">            
+        </ul>
+    </div>
+
+
+
     <script>
-        console.log($("#room_name").text())
         const roomName = JSON.parse($('#room_name').text());
         const userName = JSON.parse($('#user_name').text());
 
 
         const chatSocket = new ReconnectingWebSocket(
-            'wss://'
+            'ws://'
             + window.location.host
             + '/ws/'
             + roomName
             + '/'
         );
 
+
+        chatSocket.onopen = function(e) {
+            console.log(userName + ' has joined.');
+            message = (userName + ' entrou na sala.');
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'action': 'connect',
+                'user': userName,
+            }));
+        }
+
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             document.querySelector('#chat-log').value += (data.message + '\n');
         };
+        
+        window.addEventListener('beforeunload', function (e) {
+            chatSocket.onclose()           
+        });
 
-        chatSocket.onclose = function(e) {
+        chatSocket.onclose = function(){
             console.error('Chat socket closed unexpectedly');
-        };
+            console.log(userName + ' has leaved.');
+            message = (userName + ' saiu da sala.');
+            chatSocket.send(JSON.stringify({
+                'user': userName,
+                'message': message,
+                'action': 'disconnect'
+            }))
+
+       }
 
         document.querySelector('#chat-message-input').focus();
         document.querySelector('#chat-message-input').onkeyup = function(e) {
@@ -49,6 +79,7 @@
             chatSocket.send(JSON.stringify({
                 'message': message,
                 'user': userName,
+                'action': 'message',
             }));
             messageInputDom.value = '';
         };

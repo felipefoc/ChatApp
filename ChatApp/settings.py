@@ -76,6 +76,7 @@ TEMPLATES = [
 
 ASGI_APPLICATION = "ChatApp.asgi.application"
 
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
