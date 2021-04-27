@@ -1,6 +1,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels_presence.models import Room
+from channels_presence.models import Presence
 from asgiref.sync import sync_to_async
 from channels.db import database_sync_to_async
 import asyncio
@@ -8,28 +9,27 @@ import asyncio
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
-    online = []
-    
+    room = {} 
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
         self.user_name = self.scope['url_route']['kwargs']['user_name']
+        
 
-        @database_sync_to_async
-        def get_to_db(self):
-            return Room.objects.add(self.room_name, self.channel_name, self.scope["user"])
-   
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name,
         )
 
+        
         await self.accept()
-        await get_to_db(self)
+  
 
         
     async def disconnect(self, close_code):
+
+
         # Leave room group
         await self.channel_layer.group_discard(
             self.room_group_name,
@@ -46,6 +46,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = text_data_json.get('user')
         action = text_data_json.get('action')
         
+        
+        
         # User disconnect
         if action == 'disconnect':
             data = {
@@ -60,8 +62,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'type': 'chat_message',
                 'message': f'{message}',            
             }
-        
 
+            
 
 
         # Data to message
@@ -84,9 +86,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         
 
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({
+        await self.send(
+            text_data = json.dumps({
             'message': message,
-            #'user': self.user_name,
-            self.room_name: self.online,
+            'room': '',
+            # self.room_name: self.online,
         }))
+            
         

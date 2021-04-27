@@ -49,13 +49,11 @@
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            const room = Object.keys(data)[1];
+            console.log(data)
             document.querySelector('#chat-log').value += (data.message + '\n');
-            list = ''
-            console.log(room) //vettore
             console.log(roomName) //vettore
-            if (room == roomName) {
-                $.each(data[roomName], function(key, value){
+            if (true) {
+                $.each(data['room'], function(key, value){
                     list += '<li>' + value + '</li>';
                 })
                 $('#online-users').html(list)
