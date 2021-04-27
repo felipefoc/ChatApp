@@ -8,15 +8,23 @@
 </head>
 <body>
     What's your username?<br>
-    <input id="user_name_input" type="text" size="100"><br>
+    <input id="user_name_input" type="text" size="100" onkeypress="CheckSpace(event)"><br>
     What chat room would you like to enter?<br>
-    <input id="room_name_input" type="text" size="100"><br>
+    <input id="room_name_input" type="text" size="100" onkeypress="CheckSpace(event)"><br>
     <input id="button_submit" type="button" value="Enter">
 
     <script>
         $("#button_submit").click(function() {
-            var roomName = $("#room_name_input").val().toLowerCase();
-            var userName = $("#user_name_input").val();
+            if ($("#room_name_input").val() === ''){
+                alert('Nome da sala não pode ser nulo.');
+                preventDefault();
+            }
+            if ($("#user_name_input").val() === ''){
+                alert('Username não pode ser nulo.');
+                preventDefault();
+            }
+            var roomName = $("#room_name_input").val().toLowerCase().replaceAll(' ','');
+            var userName = $("#user_name_input").val().replaceAll(' ','');
             window.location.pathname = '/' + userName + '/' + roomName + '/';
         });
 
@@ -26,6 +34,13 @@
                 document.querySelector('#chat-message-submit').click();
             }
         }
+        function CheckSpace(event){
+            if(event.which == 32){                
+                event.preventDefault();
+                alert("Espaçamento não permitido.")
+                return false;
+            }
+        }   
     </script>
 </body>
 </html>

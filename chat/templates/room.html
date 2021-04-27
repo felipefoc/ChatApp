@@ -52,6 +52,7 @@
             console.log(data)
             document.querySelector('#chat-log').value += (data.message + '\n');
             console.log(roomName) //vettore
+            list = []
             if (true) {
                 $.each(data['room'], function(key, value){
                     list += '<li>' + value + '</li>';

@@ -1,0 +1,8 @@
+.vscode
+/__pychache__/
+__pychache__
+/__pychache__
+.venv
+venv
+/venv
+db.sqlite3
