@@ -5,11 +5,22 @@ import json
 
 class Sala(models.Model):
     name = models.CharField(max_length=20)
+    members = models.IntegerField(default=0)
 
     def create_or_join(self, name):
         room = Sala.objects.get_or_create(name=name)
         object = Sala.objects.get(name=name)
         return object
+    
+    def add_member(self, name):
+        object = Sala.objects.get(name=name)
+        object.members += 1
+        object.save()
+    
+    def remove_member(self, name):
+        object = Sala.objects.get(name=name)
+        object.members -= 1
+        object.save()
 
     def get_room(self, name):
         room = Sala.objects.get(name=name)
@@ -23,6 +34,7 @@ class Sala(models.Model):
             if user.username not in users:
                 users.append(user.username)
         return users
+
 
     def __str__(self):
         return self.name

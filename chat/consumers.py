@@ -8,8 +8,6 @@ import asyncio
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
-    sala = Sala()
-    user = Usuario()
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
@@ -21,21 +19,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name,
         )
-        room = self.sala.create_or_join(self.room_name)
-        user = self.user.add_user(self.user_name, room)
+        room = Sala.create_or_join(self, name=self.room_name)
+        Sala.add_member(self, self.room_name)
+        user = Usuario.add_user(self, self.user_name, room)
         await self.accept()
   
 
         
     async def disconnect(self, close_code):
-
-
         # Leave room group
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name,
         )
-        
+        Sala.remove_member(self.room_name)
+        Sala.objects.filter(members=0).delete()
+
     # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -48,6 +47,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         
                 # User disconnect
         if action == 'disconnect':
+            room.members -= 1
+            room.save()
             user.delete()
             data = {
                 'type': 'chat_message',
@@ -86,7 +87,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             text_data = json.dumps({
                 'message': message,
                 'room': online,
-            # self.room_name: self.online,
         }))
             
         
+
+

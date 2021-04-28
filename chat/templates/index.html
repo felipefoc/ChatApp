@@ -12,7 +12,9 @@
     What chat room would you like to enter?<br>
     <input id="room_name_input" type="text" size="100" onkeypress="CheckSpace(event)"><br>
     <input id="button_submit" type="button" value="Enter">
-
+    {% for i in rooms %}
+        {{i.name}} {{i.members}}
+    {% endfor %}
     <script>
         $("#button_submit").click(function() {
             if ($("#room_name_input").val() === ''){
@@ -40,7 +42,7 @@
                 alert("Espaçamento não permitido.")
                 return false;
             }
-        }   
+        }
     </script>
 </body>
 </html>
