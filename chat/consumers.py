@@ -59,14 +59,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if action == 'connect':
             data = {
                 'type': 'chat_message',
-                'message': f'{message}',            
+                'message': f'{message}',
+                'action': 'connect',            
             }
             
         # Data to message
         if action == 'message':
             data = {
                 'type': 'chat_message',
-                'message': f'{user}: {message}',              
+                'message': f'{message}',              
             }     
         
         # Send message to room group
@@ -77,17 +78,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Receive message from room group
     async def chat_message(self, event):
         message = event['message']
-    
-        
+        action = event.get('action')
+       
 
         # Send message to WebSocket
         room = Sala.get_room(self, self.room_name)
         online = Sala.online_users(self, room)
+        user = self.scope['url_route']['kwargs']['user_name']
+        
         await self.send(
             text_data = json.dumps({
+                'type': event['type'],
                 'message': message,
                 'room': online,
-        }))
+                'user': user,
+                'action': action
+            }))
             
         
 
