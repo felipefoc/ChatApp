@@ -32,7 +32,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name,
         )
-        Sala.remove_member(self.room_name)
+        Sala.remove_member(self, self.room_name)
         Sala.objects.filter(members=0).delete()
 
     # Receive message from WebSocket
