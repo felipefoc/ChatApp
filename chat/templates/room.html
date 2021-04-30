@@ -69,7 +69,6 @@
         </div>
     </div>
     <div id="online-users-box" class="position-absolute top-50 end-0 translate-middle-y">
-        <div class="card text-dark bg-light mb-3 style="max-width: 18rem;"></div>
         <div class="card-header">Online in this room</div>
         
         <ul class="list-group" id="online-users"></ul>
@@ -128,6 +127,9 @@
                 + '<p class="card-text">' + data.message['message'] + '</p>'
                 + '</div></div>');
             }
+
+
+            
             function getMessages(letter) {
                 var div = $("#chat-log");
                 div.scrollTop(div.prop('scrollHeight'));
