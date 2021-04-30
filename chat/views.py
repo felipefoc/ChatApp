@@ -6,7 +6,8 @@ from .models import Sala
 
 def index(request):
     rooms = Sala.objects.filter(members__gt=0)
-    Sala.objects.filter(members=0).delete()
+    Sala.objects.filter(members__lt=1).delete()
+    
     return render(request, 'index.html', {
         'rooms': rooms,
     })

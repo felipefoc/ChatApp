@@ -12,56 +12,74 @@
     <style>
         body {
             background-image: url('https://wallpaperaccess.com/full/3966884.jpg');
-            background-size: cover;
+            background-size: auto;
             font-family: 'Fira Sans', sans-serif;
+            overflow: hidden;
         }
-
         #chat-log {
-            background-image: url('https://i.pinimg.com/originals/d0/4d/f1/d04df1fcd7069cc26c778ebcc3f37720.jpg');
+            background-image: url('https://i.pinimg.com/originals/ab/ab/60/abab60f06ab52fa7846593e6ae0c9a0b.png');
             background-size: cover;
             min-height: 800px;
+            max-height: 800px;
+            max-width: 800px;
             min-width: 800px;
-            position:absolute;
+            position:fixed !important;
+            overflow-y: scroll;
+            border: 5px solid white;
+            border-radius: 100%;
+            
         }
+        #chat-log {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+          }
+        #chat-log::-webkit-scrollbar {
+            display: none;
+          }
         .card {
-            min-width: 720px;
+            min-width: 760px;
+            
         }
         #inputs {
             min-width: 720px;
+        }
+        #online-users-box {
+            width: 200px;
+            background-color: white;
+            border-radius: 2%;
+
         }
     </style>
 </head>
 <body>
     <div id="chat-log" class="shadow-lg p-3 mb-5 bg-body rounded-3 position-absolute top-50 start-50 translate-middle">
         <div class="card border-secondary mb-3" style="max-width: 18rem;">
-        <div class="card-header">NomeDoUsuario</div>
+        <div class="card-header">A simple message, from me to you.</div>
         <div class="card-body text-secondary">
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-        </div>
-        </div>
-        <div class="card border-secondary mb-3" style="max-width: 18rem;">
-        <div class="card-header">NomeDoUsuario</div>
-        <div class="card-body text-secondary">
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <p class="card-text">This is a WebChatApp! To make this happen, i used Django, Django-Channels, Websockets, jQuery, Redis, Docker and Bootstrap...
+                Feel free to see this project source in Github, just 
+                <a href="https://github.com/felipefoc/ChatApp">click Here</a></p>
         </div>
         </div>
     </div>
     <div id="inputs" class="position-absolute bottom-0 start-50 translate-middle-x">
         <div class="input-group mb-3">
             <input type="text" class="form-control" placeholder="You know what to say... right???" aria-describedby="chat-message-submit" id="chat-message-input">
-            <button class="btn btn-outline-secondary" type="button" id="chat-message-submit">Button</button>
+            <button class="btn btn-outline-info" type="button" id="chat-message-submit">Send</button>
         </div>
     </div>
+    <div id="online-users-box" class="position-absolute top-50 end-0 translate-middle-y">
+        <div class="card text-dark bg-light mb-3 style="max-width: 18rem;"></div>
+        <div class="card-header">Online in this room</div>
+        
+        <ul class="list-group" id="online-users"></ul>
+        
+    </div>
+
     {{ room_name|json_script:"room_name" }}
     {{ user_name|json_script:"user_name" }}
 
-    <div>
-        <ul id="online-users">            
-        </ul>
-    </div>
-
-
-
+ 
     <script>
         const roomName = JSON.parse($('#room_name').text());
         const userName = JSON.parse($('#user_name').text());
@@ -76,6 +94,7 @@
             + roomName
             + '/'
         );
+        
 
         {/* Connect function */}        
         chatSocket.onopen = function(e) {
@@ -93,27 +112,38 @@
             console.log(data)
             
             if (data.action === 'connect') {
-                $('#chat-log').append('<div class="card border-light mb-3" style="height: 20px">'
-                + '<div class="card-body text-secondary">'
-                + '<p class="card-text">' + data.message + '</p>'
+                $('#chat-log').append('<div class="card border-primary mb-3" style="max-width: 18rem;">'
+                + '<div class="card-body text-primary">'
+                + '<p class="card-text">' + data.message['user'] + ' joined in the room.' + '</p>'
+                + '</div></div>');
+            } else if (data.action === 'disconnect') {
+                $('#chat-log').append('<div class="card border-danger mb-3" style="max-width: 18rem;">'
+                + '<div class="card-body text-danger">'
+                + '<p class="card-text">' + data.message['user'] + ' exit from room.' + '</p>'
                 + '</div></div>');
             } else {
-        
-
-            $('#chat-log').append('<div class="card border-secondary mb-3" style="max-width: 18rem;">'
-            + '<div class="card-header">' + data.user + '</div>'
-            + '<div class="card-body text-secondary">'
-            + '<p class="card-text">' + data.message + '</p>'
-            + '</div></div>');
-            
+                $('#chat-log').append('<div class="card border-secondary mb-3" style="max-width: 18rem;">'
+                + '<div class="card-header">' + data.message['user'] + '</div>'
+                + '<div class="card-body text-secondary">'
+                + '<p class="card-text">' + data.message['message'] + '</p>'
+                + '</div></div>');
+            }
+            function getMessages(letter) {
+                var div = $("#chat-log");
+                div.scrollTop(div.prop('scrollHeight'));
             }
             
-        
-        
+            $(function() {
+                getMessages();
+            });
+
+            
             list = []
             if (true) {
                 $.each(data['room'], function(key, value){
-                    list += '<li>' + value + '</li>';
+                    list += '<li class="list-group-item">'
+                        + '<img src="https://icons.iconarchive.com/icons/custom-icon-design/flatastic-10/256/Trafficlight-green-icon.png" style="width: 15px; height: 15px;">     '
+                        +  value + '</li>';
                 })
                 $('#online-users').html(list)
             }

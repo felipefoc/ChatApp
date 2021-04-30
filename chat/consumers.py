@@ -52,14 +52,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
             user.delete()
             data = {
                 'type': 'chat_message',
-                'message': f'{message}'
+                'message': {
+                    'user' :f'{user}',
+                    'message' :f'{message}'
+                },
+                'action': 'disconnect'
             }
 
         # User connect
         if action == 'connect':
             data = {
                 'type': 'chat_message',
-                'message': f'{message}',
+                'message': {
+                    'user' :f'{user}',
+                    'message' :f'{message}'
+                },
                 'action': 'connect',            
             }
             
@@ -67,7 +74,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if action == 'message':
             data = {
                 'type': 'chat_message',
-                'message': f'{message}',              
+                'message': {
+                    'user' :f'{user}',
+                    'message' :f'{message}'
+                },              
             }     
         
         # Send message to room group
@@ -84,14 +94,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Send message to WebSocket
         room = Sala.get_room(self, self.room_name)
         online = Sala.online_users(self, room)
-        user = self.scope['url_route']['kwargs']['user_name']
+        user = Usuario.objects.get(username=self.user_name)
         
         await self.send(
             text_data = json.dumps({
                 'type': event['type'],
                 'message': message,
                 'room': online,
-                'user': user,
+                'user': self.user_name,
                 'action': action
             }))
             
