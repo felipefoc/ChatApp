@@ -85,7 +85,7 @@
 
 
         const chatSocket = new ReconnectingWebSocket(
-            'ws://'
+            'wss://'
             + window.location.host
             + '/ws/'
             + userName
@@ -129,7 +129,7 @@
             }
 
 
-            
+
             function getMessages(letter) {
                 var div = $("#chat-log");
                 div.scrollTop(div.prop('scrollHeight'));
